@@ -4,9 +4,6 @@ import org.granja.creacionales.factorymethod.Animal;
 
 import java.util.Scanner;
 
-/**
- * Menú consola que usa GranjaFacade. Importa explicitamente la interfaz Animal del package factorymethod.
- */
 public class MenuConsola {
 
     private final GranjaFacade fachada;
@@ -22,75 +19,72 @@ public class MenuConsola {
         do {
             mostrarMenu();
             System.out.print("Seleccione una opción: ");
-            opcion = leerEntero();
+            opcion = obtenerEntero();
 
             switch (opcion) {
                 case 1 -> crearAnimal();
                 case 2 -> monitorearAnimal();
-                case 3 -> aplicarEstrategia();
-                case 4 -> ejecutarComando();
-                case 5 -> fachada.simularCambioEstado();
+                case 3 -> fachada.aplicarEstrategia(pedirTexto("Ingrese estación (verano/invierno/ahorro): "));
+                case 4 -> fachada.ejecutarComando(pedirTexto("Ingrese comando (dispensar/riego/evento): "));
+                case 5 -> fachada.simularEstadoAnimal();
                 case 6 -> fachada.mostrarEstadoSistema();
-                case 0 -> System.out.println("👋 Saliendo...");
-                default -> System.out.println("⚠️ Opción inválida.");
+                case 7 -> fachada.mostrarAnimalesRegistrados();
+                case 8 -> fachada.mostrarHistorialAcciones();
+                case 9 -> fachada.resumenGeneral();
+                case 10 -> fachada.limpiarSistema();
+                case 0 -> System.out.println("👋 Saliendo del sistema...");
+                default -> System.out.println("⚠️ Opción no válida.");
             }
 
             if (opcion != 0) {
-                System.out.println("\nPresiona ENTER para continuar...");
+                System.out.println("\nPresione ENTER para continuar...");
                 scanner.nextLine();
             }
         } while (opcion != 0);
     }
 
     private void mostrarMenu() {
-        System.out.println("\n===== MENÚ - GRANJA INTELIGENTE =====");
-        System.out.println("1. Crear animal (vaca/cerdo/gallina)");
-        System.out.println("2. Monitorear animal (usar sensores)");
-        System.out.println("3. Aplicar estrategia de alimentación (verano/invierno/ahorro)");
-        System.out.println("4. Ejecutar comando (dispensar/riego/evento)");
-        System.out.println("5. Simular cambio de estado (state)");
-        System.out.println("6. Mostrar estado del alimentador (singleton)");
+        System.out.println("\n===== 🌾 MENÚ DE LA GRANJA INTELIGENTE =====");
+        System.out.println("1. Crear animal (Factory Method)");
+        System.out.println("2. Monitorear animal (Adapter + Facade + Decorator)");
+        System.out.println("3. Aplicar estrategia de alimentación (Strategy)");
+        System.out.println("4. Ejecutar comando manual (Command)");
+        System.out.println("5. Simular estados de salud (State)");
+        System.out.println("6. Mostrar estado del sistema (Singleton)");
+        System.out.println("7. Ver animales registrados");
+        System.out.println("8. Ver historial de acciones");
+        System.out.println("9. Ver resumen general del sistema");
+        System.out.println("10. Reiniciar sistema (limpiar animales y registros)");
         System.out.println("0. Salir");
-        System.out.println("=====================================");
+        System.out.println("============================================");
     }
 
     private void crearAnimal() {
-        System.out.print("Tipo de animal: ");
-        String tipo = scanner.nextLine().trim();
-        Animal animal = fachada.crearAnimal(tipo);
-        if (animal != null) {
-            System.out.println("→ Animal creado correctamente.");
-        }
+        String tipo = pedirTexto("Ingrese tipo de animal (vaca/cerdo/gallina): ");
+        fachada.crearAnimal(tipo);
     }
 
     private void monitorearAnimal() {
-        System.out.print("Tipo de animal a crear y monitorear (vaca/cerdo/gallina): ");
-        String tipo = scanner.nextLine().trim();
+        String tipo = pedirTexto("Ingrese tipo de animal (vaca/cerdo/gallina): ");
         Animal animal = fachada.crearAnimal(tipo);
-        if (animal == null) return;
-        System.out.print("Usar GPS? (s/n): ");
-        String r = scanner.nextLine().trim();
-        boolean usarGPS = r.equalsIgnoreCase("s");
-        fachada.monitorearAnimal(animal, usarGPS);
+
+        if (animal != null) {
+            System.out.print("¿Usar GPS? (s/n): ");
+            boolean usarGPS = scanner.nextLine().equalsIgnoreCase("s");
+            fachada.monitorearAnimal(animal, usarGPS);
+        }
     }
 
-    private void aplicarEstrategia() {
-        System.out.print("Estación (invierno/verano/ahorro): ");
-        String estacion = scanner.nextLine().trim();
-        fachada.aplicarEstrategia(estacion);
-    }
-
-    private void ejecutarComando() {
-        System.out.print("Comando (dispensar/riego/evento): ");
-        String cmd = scanner.nextLine().trim();
-        fachada.ejecutarComando(cmd);
-    }
-
-    private int leerEntero() {
+    private int obtenerEntero() {
         try {
-            return Integer.parseInt(scanner.nextLine().trim());
-        } catch (Exception e) {
+            return Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
             return -1;
         }
+    }
+
+    private String pedirTexto(String mensaje) {
+        System.out.print(mensaje);
+        return scanner.nextLine();
     }
 }
